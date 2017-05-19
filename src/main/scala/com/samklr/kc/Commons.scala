@@ -3,11 +3,10 @@ package com.samklr.kc
 import java.sql.Timestamp
 import java.text.{DateFormat, SimpleDateFormat}
 
+import org.apache.avro.io.DecoderFactory
+import org.apache.avro.specific.SpecificDatumReader
+
 object Commons {
-
-  case class UserEvent(user_id: String, time: Timestamp, event: String)
-      extends Serializable
-
   def getTimeStamp(timeStr: String): Timestamp = {
     val dateFormat1: DateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     val dateFormat2: DateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
@@ -22,5 +21,4 @@ object Commons {
     }
     date.getOrElse(Timestamp.valueOf(timeStr))
   }
-
 }

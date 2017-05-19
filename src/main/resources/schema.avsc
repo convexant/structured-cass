@@ -1,0 +1,18 @@
+{
+  "namespace": "com.samklr.avro.messages",
+  "type": "record",
+  "name": "MtmMessageValue",
+  "fields": [
+      {
+        "name": "date",
+        "type": "int"
+      },
+      {
+        "name": "mtms",
+        "type": {
+          "type": "array",
+          "items": "double"
+        }
+      }
+    ]
+  }
