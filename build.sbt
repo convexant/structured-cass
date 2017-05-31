@@ -1,4 +1,4 @@
-name := "structured-stream-kafka-to-cassandra"
+name := "structured-pipeline"
 
 version := "1.0"
 
@@ -26,7 +26,6 @@ libraryDependencies ++= {
     "com.holdenkarau" %% "spark-testing-base" % "2.0.0_0.4.4",
     "com.datastax.cassandra" % "cassandra-driver-core" % "3.1.2",
     "com.google.guava" % "guava" % "19.0",
-    "org.apache.commons" % "commons-lang3" % "3.5",
     "org.apache.avro" % "avro" % "1.8.1",
     "io.confluent" % "kafka-avro-serializer" % "3.2.1",
      "com.twitter" % "bijection-core_2.11" % "0.9.5",
@@ -38,7 +37,7 @@ libraryDependencies ++= {
 parallelExecution in Test := false
 
 javaOptions ++= Seq("-Xms512M",
-                    "-Xmx4096M",
+                    "-Xmx2048M",
                     "-XX:MaxPermSize=2048M",
                     "-XX:+CMSClassUnloadingEnabled")
 

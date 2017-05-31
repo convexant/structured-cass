@@ -1,0 +1,15 @@
+{
+  "namespace": "com.samklr.avro.messages",
+  "type": "record",
+  "name": "MtmMessageKey",
+  "fields": [
+      {
+        "name": "jobId",
+        "type": "string"
+      },
+      {
+        "name": "sc",
+        "type": "long"
+      }
+    ]
+  }

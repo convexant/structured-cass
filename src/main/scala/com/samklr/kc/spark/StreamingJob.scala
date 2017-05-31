@@ -49,15 +49,13 @@ object StreamingJob {
       override def open(partitionId: Long, version: Long) = true
 
       override def process(value: MtmMessageValue) = {
-
         connector.withSessionDo { session =>
           session.execute(CassandraUtils.cql(value.getDate.toString, value.getMtms.toString))
         }
-
-        println("Processed And pushed====== >>  " +value)
+        println("Processed And pushed====== >>  " + value)
       }
 
-      override def close(errorOrNull: Throwable) = {}
+      override def close(errorOrNull: Throwable) = ???
     }
 
     val query =
@@ -66,7 +64,8 @@ object StreamingJob {
         .foreach(writer)
         .start
 
-    query.awaitTermination()
+    query.awaitTermination
+    session.close
   }
 }
 

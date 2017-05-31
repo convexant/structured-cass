@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/spark-structured-streaming.iml" filepath="$PROJECT_DIR$/.idea/modules/spark-structured-streaming.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/spark-structured-streaming-build.iml" filepath="$PROJECT_DIR$/.idea/modules/spark-structured-streaming-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/structured-pipeline.iml" filepath="$PROJECT_DIR$/.idea/modules/structured-pipeline.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/structured-pipeline-build.iml" filepath="$PROJECT_DIR$/.idea/modules/structured-pipeline-build.iml" />
     </modules>
   </component>
 </project>
