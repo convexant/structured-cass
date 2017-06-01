@@ -26,13 +26,14 @@ object MTMProducer {
 
     val producer = new KafkaProducer[Array[Byte], Array[Byte]](conf)
 
-    for(i<- 1 to 100000000){
+    for(i<- 1 to 10000){
       val message = randomMessage
 
       val key = AvroConverter.keysToBytes(message._1)
-      val value = AvroConverter.valToBytes(message._2)
 
-      val record = new ProducerRecord("trade-mtms", key, value)
+      message._2.foreach( v =>
+      val record = new ProducerRecord("trade-mtms", key, AvroConverter.valToBytes(v))
+
       try {
         producer.send(record, new Callback {
           override def onCompletion(metadata: RecordMetadata, exception: Exception): Unit = {
@@ -48,20 +49,28 @@ object MTMProducer {
       }
     }
     producer.close
+
+      )
+
+
   }
 
-
-  def randomMessage  = (
-    MtmMessageKey.newBuilder()
+  def randomMessage : (MtmMessageKey, IndexedSeq[MtmMessageValue])  = (
+    val key = MtmMessageKey.newBuilder()
       .setJobId(UUID.randomUUID().toString)
       .setSc(new Random().nextLong())
-      .build(),
+      .build()
 
-    MtmMessageValue.newBuilder()
-      .setDate(new Random().nextInt())
+    val values = (0 to 76) .map(
+
+      MtmMessageValue.newBuilder()
+      .setDate(_)
       .setMtms(Arrays.asList(Random.nextDouble(), Random.nextDouble()))
       .build()
     )
+
+    (key, values)
+  )
 
 
 }

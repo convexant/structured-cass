@@ -1,14 +1,17 @@
 
 import com.datastax.spark.connector.cql.CassandraConnector
 import com.samklr.kc.avro.AvroConverter
-import com.samklr.avro.messages.MtmMessageValue
+import com.samklr.avro.messages.{MtmMessageKey, MtmMessageValue}
 import com.samklr.kc.utils.CassandraUtils
 import org.apache.spark.sql.SparkSession
 
 
 object MtmEncoders {
-  implicit def mtmEncoder: org.apache.spark.sql.Encoder[MtmMessageValue] =
+  implicit def mtmValuesEncoder: org.apache.spark.sql.Encoder[MtmMessageValue] =
     org.apache.spark.sql.Encoders.javaSerialization(classOf[MtmMessageValue])  //    kryo[MtmMessageValue]
+
+  implicit def mtmKeysEncoder: org.apache.spark.sql.Encoder[MtmMessageKey] =
+    org.apache.spark.sql.Encoders.javaSerialization(classOf[MtmMessageKey])
 }
 
 object StreamingJob {
@@ -40,7 +43,7 @@ object StreamingJob {
       .option("startingOffsets", "latest")
       .load()
       .select($"value".as[Array[Byte]])
-      .map(AvroConverter.toMtm(_))
+      .map(AvroConverter.valToMtm(_))
       .as[MtmMessageValue]
 
     //  Foreach sink writer to push the output to cassandra.
