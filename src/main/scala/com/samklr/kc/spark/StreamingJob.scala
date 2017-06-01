@@ -60,12 +60,9 @@ object StreamingJob {
                .flatMapGroups{
                  // Check if the Iterator contains the 76 dates. if so return the said dates
                  case ( sc, iter) =>  iter.map(_.mtms)
-
                }
 
     ds.printSchema()
-
-
 
     //  Foreach sink writer to push the output to cassandra.
     import org.apache.spark.sql.ForeachWriter
@@ -73,6 +70,7 @@ object StreamingJob {
       override def open(partitionId: Long, version: Long) = true
 
       override def process(kv : Array[Double]) = {
+        // cassandraLoad(kv)
         println (kv.mkString(" "))
       }
 

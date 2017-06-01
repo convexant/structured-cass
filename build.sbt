@@ -21,6 +21,7 @@ libraryDependencies ++= {
     "org.apache.spark" %% "spark-sql-kafka-0-10" % sparkV,
     "org.apache.spark" %% "spark-sql" % sparkV,
     "org.apache.spark" %% "spark-hive" % sparkV,
+    "org.apache.spark" %% "spark-streaming-kafka-0-10" % sparkV,
     "com.datastax.spark" %% "spark-cassandra-connector" % cassandraV,
     "org.scalatest" %% "scalatest" % "3.0.0" % "test",
     "com.holdenkarau" %% "spark-testing-base" % "2.0.0_0.4.4",
@@ -29,7 +30,8 @@ libraryDependencies ++= {
     "org.apache.avro" % "avro" % "1.8.1",
     "io.confluent" % "kafka-avro-serializer" % "3.2.1",
      "com.twitter" % "bijection-core_2.11" % "0.9.5",
-     "com.twitter" % "bijection-avro_2.11" % "0.9.5"
+     "com.twitter" % "bijection-avro_2.11" % "0.9.5",
+    "com.typesafe" % "config" % "1.2.1"
 
   )
 }
