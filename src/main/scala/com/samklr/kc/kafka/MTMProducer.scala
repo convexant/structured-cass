@@ -20,57 +20,55 @@ object MTMProducer {
     conf.put("acks", "all")
     conf.put("request.timeout.ms", "30000")
     conf.put("retries", "3")
-    conf.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+    conf.put("key.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer")
     conf.put("value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer")//"io.confluent.kafka.serializers.KafkaAvroSerializer")//
     conf.put("schema.registry.url", "http://localhost:8081")
 
     val producer = new KafkaProducer[Array[Byte], Array[Byte]](conf)
 
-    for(i<- 1 to 10000){
+    for(i<- 1 to 10000000) {
       val message = randomMessage
 
       val key = AvroConverter.keysToBytes(message._1)
 
-      message._2.foreach( v =>
-      val record = new ProducerRecord("trade-mtms", key, AvroConverter.valToBytes(v))
+      message._2.foreach { v =>
+        val record = new ProducerRecord("trade-mtms", key, AvroConverter.valToBytes(v))
 
-      try {
-        producer.send(record, new Callback {
-          override def onCompletion(metadata: RecordMetadata, exception: Exception): Unit = {
-            if (exception != null) {
-              exception.printStackTrace()
+        try {
+          producer.send(record, new Callback {
+            override def onCompletion(metadata: RecordMetadata, exception: Exception): Unit = {
+              if (exception != null) {
+                exception.printStackTrace()
+              }
+              println("Pushed ==> " + record)
             }
-            println ("Pushed ==> " + record)
-          }
-        })
-      }
-      catch {
-        case NonFatal(e) => println("Error !!!!!!!! "+ e)
+          })
+        }
+        catch {
+          case NonFatal(e) => println("Error !!!!!!!! " + e)
+        }
       }
     }
+
     producer.close
-
-      )
-
-
   }
 
-  def randomMessage : (MtmMessageKey, IndexedSeq[MtmMessageValue])  = (
+  def randomMessage : (MtmMessageKey, IndexedSeq[MtmMessageValue])  = {
     val key = MtmMessageKey.newBuilder()
       .setJobId(UUID.randomUUID().toString)
       .setSc(new Random().nextLong())
       .build()
 
-    val values = (0 to 76) .map(
+    val values = (0 to 76).map(
 
       MtmMessageValue.newBuilder()
-      .setDate(_)
-      .setMtms(Arrays.asList(Random.nextDouble(), Random.nextDouble()))
-      .build()
+        .setDate(_)
+        .setMtms(Arrays.asList(Random.nextDouble(), Random.nextDouble()))
+        .build()
     )
 
     (key, values)
-  )
+  }
 
 
 }

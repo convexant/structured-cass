@@ -1,9 +1,9 @@
 
-import com.datastax.spark.connector.cql.CassandraConnector
-import com.samklr.kc.avro.AvroConverter
 import com.samklr.avro.messages.{MtmMessageKey, MtmMessageValue}
-import com.samklr.kc.utils.CassandraUtils
+import com.samklr.kc.avro.AvroConverter
 import org.apache.spark.sql.SparkSession
+
+import scala.collection.JavaConverters._
 
 
 object MtmEncoders {
@@ -20,21 +20,21 @@ object StreamingJob {
 
     // Get Spark session
     val session =
-    SparkSession.builder
-      .master("local[2]")
-      .appName("Pipeline")
-      .config("spark.cassandra.connection.host", "localhost")
-      .getOrCreate()
+      SparkSession.builder
+        .master("local[2]")
+        .appName("Pipeline")
+        .config("spark.cassandra.connection.host", "localhost")
+        .getOrCreate()
 
 
-    val connector = CassandraConnector.apply(session.sparkContext.getConf)
-    // Create keyspace and tables here, NOT in prod
-    connector.withSessionDo { session =>
-      CassandraUtils.createKeySpaceAndTable(session, true)
-    }
+    /* val connector = CassandraConnector.apply(session.sparkContext.getConf)
+     // Create keyspace and tables here, NOT in prod
+     connector.withSessionDo { session =>
+       CassandraUtils.createKeySpaceAndTable(session, true)
+     }*/
 
     import session.implicits._
-    import MtmEncoders._
+    val cols = List("sc", "date", "mtms")
 
     val lines = session.readStream
       .format("kafka")
@@ -42,39 +42,55 @@ object StreamingJob {
       .option("kafka.bootstrap.servers", "localhost:9092")
       .option("startingOffsets", "latest")
       .load()
-      .select($"value".as[Array[Byte]])
-      .map(AvroConverter.valToMtm(_))
-      .as[MtmMessageValue]
+      .selectExpr("CAST(key AS BINARY)","CAST (value as BINARY)")
+      .as[(Array[Byte], Array[Byte])]
+
+    lines.printSchema()
+
+     val df = lines.map{ line =>
+        val kv = (AvroConverter.keysToMtm(line._1), AvroConverter.valToMtm(line._2))
+        (kv._1.getSc, kv._2.getDate, kv._2.getMtms.asScala.toArray)
+      }.toDF(cols: _*)
+
+    df.printSchema()
+
+    val ds = df.select($"sc", $"date", $"mtms")
+               .as[Rec]
+               .groupByKey(rec => rec.sc)
+               .flatMapGroups{
+                 // Check if the Iterator contains the 76 dates. if so return the said dates
+                 case ( sc, iter) =>  iter.map(_.mtms)
+
+               }
+
+    ds.printSchema()
+
+
 
     //  Foreach sink writer to push the output to cassandra.
     import org.apache.spark.sql.ForeachWriter
-    val writer = new ForeachWriter[MtmMessageValue] {
+    val writer = new ForeachWriter[Array[Double]] {
       override def open(partitionId: Long, version: Long) = true
 
-      override def process(value: MtmMessageValue) = {
-        connector.withSessionDo { session =>
-          session.execute(CassandraUtils.cql(value.getDate.toString, value.getMtms.toString))
-        }
-        println("Processed And pushed====== >>  " + value)
+      override def process(kv : Array[Double]) = {
+        println (kv.mkString(" "))
       }
 
-      override def close(errorOrNull: Throwable) = ???
+      override def close(errorOrNull: Throwable) = {
+        println ("Error : " + errorOrNull )
+      }
     }
 
-    val query =
-      lines.writeStream
-        .queryName("printer")
-        .foreach(writer)
-        .start
+
+    val query = ds.writeStream
+      .queryName("Kafka Outputer")
+      .foreach(writer)
+      .start()
 
     query.awaitTermination
     session.close
   }
-}
 
-/* val query = lines.writeStream
-   .outputMode("Append")
-   .format("console")
-   .start()
- query.awaitTermination()
-*/
+  case class Rec( sc : Long, date : Int, mtms : Array[Double])
+
+}

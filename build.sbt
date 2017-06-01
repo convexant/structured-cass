@@ -13,7 +13,7 @@ val repositories = Seq(
 resolvers ++= repositories
 
 libraryDependencies ++= {
-  val sparkV = "2.1.1"
+  val sparkV = "2.1.0"
   val cassandraV = "2.0.0-M3"
   Seq(
     "org.apache.spark" %% "spark-core" % sparkV,

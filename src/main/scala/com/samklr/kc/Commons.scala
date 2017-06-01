@@ -3,6 +3,7 @@ package com.samklr.kc
 import java.sql.Timestamp
 import java.text.{DateFormat, SimpleDateFormat}
 
+import com.samklr.kc.kafka.MTMProducer
 import org.apache.avro.io.DecoderFactory
 import org.apache.avro.specific.SpecificDatumReader
 
@@ -20,5 +21,13 @@ object Commons {
       }
     }
     date.getOrElse(Timestamp.valueOf(timeStr))
+  }
+
+  def main(args: Array[String]): Unit = {
+    val m = MTMProducer.randomMessage
+
+    m._2.foreach { v =>
+      println (m._1, v)
+    }
   }
 }
