@@ -22,7 +22,7 @@ object MTMProducer {
     conf.put("retries", "3")
     conf.put("key.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer")
     conf.put("value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer")//"io.confluent.kafka.serializers.KafkaAvroSerializer")//
-    conf.put("schema.registry.url", "http://localhost:8081")
+   // conf.put("schema.registry.url", "http://localhost:8081")
 
     val producer = new KafkaProducer[Array[Byte], Array[Byte]](conf)
 
@@ -45,7 +45,7 @@ object MTMProducer {
           })
         }
         catch {
-          case NonFatal(e) => println("Error !!!!!!!! " + e)
+          case NonFatal(e) => println("Error !!!!!!!! " + e.getMessage)
         }
       }
     }
@@ -59,8 +59,7 @@ object MTMProducer {
       .setSc(new Random().nextLong())
       .build()
 
-    val values = (0 to 76).map(
-
+    val values = (1 to 76).map(
       MtmMessageValue.newBuilder()
         .setDate(_)
         .setMtms(Arrays.asList(Random.nextDouble(), Random.nextDouble()))

@@ -16,7 +16,6 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.streaming.dstream.InputDStream
 import java.net.InetAddress
 
-import StreamingJob.Rec
 import com.samklr.kc.avro.AvroConverter
 import com.typesafe.config.ConfigFactory
 import org.apache.spark.sql.SparkSession
@@ -28,6 +27,7 @@ import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 
 object DStreamJob {
 
+  case class Rec( sc : Long, date : Int, mtms : Array[Double])
 
   def main(args: Array[String]): Unit = {
 
@@ -54,7 +54,8 @@ object DStreamJob {
 
     val topics = conf.getString("kafka.topics").split(",")
 
-    val stream: InputDStream[ConsumerRecord[Array[Byte], Array[Byte]]] = KafkaUtils.createDirectStream[Array[Byte], Array[Byte]](
+    val stream: InputDStream[ConsumerRecord[Array[Byte], Array[Byte]]] =
+      KafkaUtils.createDirectStream[Array[Byte], Array[Byte]](
       ssc,
       PreferConsistent,
       Subscribe[Array[Byte], Array[Byte]](Array(""), kafkaParams)
@@ -65,7 +66,7 @@ object DStreamJob {
                       }
                     .map( x => (x._1.getSc, x._2.getDate, x._2.getMtms.asScala.toArray))
                     .map{ rdd =>
-                       // Create a dataset, get the latest 76 dates of the same scenario group and rewrite
+
 
                     }
 
@@ -80,5 +81,4 @@ object DStreamJob {
   }
 }
 
-case class Rec( sc : Long, date : Int, mtms : Array[Double])
 
