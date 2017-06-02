@@ -31,7 +31,8 @@ libraryDependencies ++= {
     "io.confluent" % "kafka-avro-serializer" % "3.2.1",
      "com.twitter" % "bijection-core_2.11" % "0.9.5",
      "com.twitter" % "bijection-avro_2.11" % "0.9.5",
-    "com.typesafe" % "config" % "1.2.1"
+    "com.typesafe" % "config" % "1.2.1" ,
+    "org.apache.kafka" % "kafka-streams" % "0.10.2.1"
 
   )
 }

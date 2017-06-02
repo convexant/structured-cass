@@ -7,7 +7,7 @@ import com.datastax.driver.core.Session
 
 object CassandraUtils extends Serializable {
 
-  def cql(date: String, mtms: String): String =
+  def simple(date: String, mtms: String): String =
     s"""
        insert into my_keyspace.test_table (date, mtms)
        values('$date', '$mtms')"""
@@ -29,7 +29,6 @@ object CassandraUtils extends Serializable {
       session.execute(stmt)
     }
     //TODO care about index ??
-
 
   }
 /*

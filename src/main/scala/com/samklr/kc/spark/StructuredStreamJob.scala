@@ -32,7 +32,7 @@ object StreamingJob {
       SparkSession.builder
         .master("local[4]")
         .appName("Kafka Aggreg")
-        .config("spark.cassandra.connection.host", "localhost")
+        .config("spark.cassandra.connection.host", "172.29.2.124")
         .getOrCreate()
 
 
